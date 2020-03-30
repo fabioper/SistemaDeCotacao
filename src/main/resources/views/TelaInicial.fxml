@@ -3,9 +3,8 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.infnet.gui.controllers.TelaInicialController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.infnet.gui.controllers.TelaInicialController">
    <center>
-      <VBox BorderPane.alignment="CENTER" />
+       <VBox BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

@@ -1,6 +1,7 @@
-package br.edu.infnet.produtos.produto;
+package br.edu.infnet.infra;
 
-import br.edu.infnet.dados.FabricaDeConexoes;
+import br.edu.infnet.domain.produtos.Produto;
+import br.edu.infnet.domain.produtos.ProdutoRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,8 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProdutoDAO {
-    public final Produto inserir(Produto produto) {
+public class ProdutoRepositoryImpl implements ProdutoRepository {
+    @Override
+    public Produto inserir(Produto produto) {
         try (var conexao = FabricaDeConexoes.conectar()) {
             var sql = "INSERT INTO produtos (nome, fornecedor) VALUES (?, ?)";
 
@@ -30,7 +32,8 @@ public class ProdutoDAO {
         return null;
     }
 
-    public final Produto alterar(Produto produto) {
+    @Override
+    public Produto alterar(Produto produto) {
         try (var conexao = FabricaDeConexoes.conectar()) {
             var sql = "UPDATE produtos SET produtos.nome=?, produtos.fornecedor=? " +
                     "   WHERE produtos.id=?";
@@ -38,6 +41,7 @@ public class ProdutoDAO {
             var statement = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, produto.getNome());
             statement.setString(2, produto.getFornecedor());
+            statement.setInt(3, produto.getId());
             statement.executeUpdate();
 
             var resultado = statement.getGeneratedKeys();
@@ -52,7 +56,8 @@ public class ProdutoDAO {
         return null;
     }
 
-    public final void excluir(int id) {
+    @Override
+    public void excluir(int id) {
         try (var conn = FabricaDeConexoes.conectar()) {
             var sql = "DELETE FROM produtos WHERE id=?";
             try (var statement = conn.prepareStatement(sql)) {
@@ -64,7 +69,8 @@ public class ProdutoDAO {
         }
     }
 
-    public final List<Produto> listar() {
+    @Override
+    public List<Produto> listar() {
         try (var conexao = FabricaDeConexoes.conectar()) {
             var query = "SELECT produtos.id, produtos.nome, produtos.fornecedor FROM produtos";
             var statement = conexao.createStatement();
@@ -84,7 +90,8 @@ public class ProdutoDAO {
         return null;
     }
 
-    public final Produto obterPorId(int id) {
+    @Override
+    public Produto obterPorId(int id) {
         try (var conn = FabricaDeConexoes.conectar()) {
             var sql = "SELECT produtos.id, produtos.nome, produtos.fornecedor" +
                     "   FROM produtos WHERE produtos.id=?";
@@ -104,7 +111,8 @@ public class ProdutoDAO {
         return null;
     }
 
-    public final List<Produto> listarPorFornecedor(String fornecedor) {
+    @Override
+    public List<Produto> obterPorFornecedor(String fornecedor) {
         try (var conn = FabricaDeConexoes.conectar()) {
             var sql = "SELECT produtos.id, produtos.nome, produtos.fornecedor FROM produtos" +
                     "   WHERE produtos.fornecedor=?";

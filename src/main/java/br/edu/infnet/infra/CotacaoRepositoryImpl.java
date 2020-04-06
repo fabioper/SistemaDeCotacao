@@ -1,7 +1,8 @@
-package br.edu.infnet.produtos.cotacao;
+package br.edu.infnet.infra;
 
-import br.edu.infnet.dados.FabricaDeConexoes;
-import br.edu.infnet.produtos.produto.Produto;
+import br.edu.infnet.domain.cotacoes.Cotacao;
+import br.edu.infnet.domain.cotacoes.CotacaoRepository;
+import br.edu.infnet.domain.produtos.Produto;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -10,8 +11,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CotacaoDAO {
-    public final Cotacao inserir(Cotacao cotacao) {
+public class CotacaoRepositoryImpl implements CotacaoRepository {
+    @Override
+    public Cotacao inserir(Cotacao cotacao) {
         try (var conexao = FabricaDeConexoes.conectar()) {
             var sql = "INSERT INTO cotacoes (cotacoes.produto_id, cotacoes.data, cotacoes.preco)" +
                     "   VALUES (?, ?, ?)";
@@ -36,7 +38,8 @@ public class CotacaoDAO {
         return null;
     }
 
-    public final Cotacao alterar(int id, Cotacao cotacao) {
+    @Override
+    public Cotacao alterar(Cotacao cotacao) {
         try (var conexao = FabricaDeConexoes.conectar()) {
             var sql = "UPDATE cotacoes SET cotacoes.preco = ?, cotacoes.data = ?, cotacoes.produto_id = ?";
 
@@ -58,7 +61,8 @@ public class CotacaoDAO {
         return null;
     }
 
-    public final void excluir(int id) {
+    @Override
+    public void excluir(int id) {
         try (var conn = FabricaDeConexoes.conectar()) {
             var sql = "DELETE FROM cotacoes WHERE id=?";
             try (var statement = conn.prepareStatement(sql)) {
@@ -70,7 +74,8 @@ public class CotacaoDAO {
         }
     }
 
-    public final List<Cotacao> listar() {
+    @Override
+    public List<Cotacao> listar() {
         try (var conexao = FabricaDeConexoes.conectar()) {
             var query = "SELECT cotacoes.id, cotacoes.produto_id, cotacoes.data, cotacoes.preco, " +
                     "   produtos.nome, produtos.fornecedor FROM cotacoes" +
@@ -92,7 +97,32 @@ public class CotacaoDAO {
         return null;
     }
 
-    public final List<Cotacao> listarPorProduto(Produto produto) {
+    @Override
+    public Cotacao obterPorId(int id) {
+        try (var conn = FabricaDeConexoes.conectar()) {
+            var sql = "SELECT cotacoes.id, cotacoes.produto_id, cotacoes.data," +
+                    "   produtos.nome, produtos.fornecedor, cotacoes.preco" +
+                    "   FROM cotacoes " +
+                    "   JOIN produtos ON cotacoes.produto_id=produtos.id " +
+                    "   WHERE cotacoes.id=?";
+            try (var statement = conn.prepareStatement(sql)) {
+                statement.setInt(1, id);
+
+                var retorno = statement.executeQuery();
+
+                if (retorno != null && retorno.next()) {
+                    return mapearCotacao(retorno);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Cotacao> obterPorProduto(Produto produto) {
         try (var conn = FabricaDeConexoes.conectar()) {
             var sql = "SELECT cotacoes.id, cotacoes.produto_id, cotacoes.data," +
                     "   produtos.nome, produtos.fornecedor, cotacoes.preco" +
@@ -110,29 +140,6 @@ public class CotacaoDAO {
                     cotacoes.add(mapearCotacao(retorno));
                 }
                 return cotacoes;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public final Cotacao obterPorId(int id) {
-        try (var conn = FabricaDeConexoes.conectar()) {
-            var sql = "SELECT cotacoes.id, cotacoes.produto_id, cotacoes.data," +
-                    "   produtos.nome, produtos.fornecedor, cotacoes.preco" +
-                    "   FROM cotacoes " +
-                    "   JOIN produtos ON cotacoes.produto_id=produtos.id " +
-                    "   WHERE cotacoes.id=?";
-            try (var statement = conn.prepareStatement(sql)) {
-                statement.setInt(1, id);
-
-                var retorno = statement.executeQuery();
-
-                if (retorno != null && retorno.next()) {
-                    return mapearCotacao(retorno);
-                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

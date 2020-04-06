@@ -1,4 +1,4 @@
-package br.edu.infnet.dados;
+package br.edu.infnet.infra;
 
 import br.edu.infnet.LeitorDePropriedades;
 

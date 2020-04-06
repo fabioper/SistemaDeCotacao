@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane id="border-pane" prefHeight="200.0" prefWidth="200.0"
+            fx:controller="br.edu.infnet.ui.controllers.CadastrarProdutoController" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_LEFT">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                </padding>
+                <Label id="tab__title" text="Cadastrar Produto"/>
+            </HBox>
+            <Separator prefWidth="200.0"/>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="20.0" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </BorderPane.margin>
+            <VBox prefWidth="100.0" spacing="5.0">
+                <Label text="Nome"/>
+                <TextField fx:id="inputNome" maxWidth="400.0" promptText="Digite o nome do produto"
+                           VBox.vgrow="ALWAYS">
+                    <cursor>
+                        <Cursor fx:constant="TEXT"/>
+                    </cursor>
+                </TextField>
+            </VBox>
+            <VBox layoutX="10.0" layoutY="10.0" prefWidth="100.0" spacing="5.0">
+                <Label text="Fornecedor"/>
+                <TextField fx:id="fornecedorInput" maxWidth="400.0" promptText="Digite o nome do fornecedor"
+                           VBox.vgrow="ALWAYS">
+                    <cursor>
+                        <Cursor fx:constant="TEXT"/>
+                    </cursor>
+                </TextField>
+            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <Button mnemonicParsing="false" onAction="#cadastrarProduto" text="Cadastrar Produto">
+                    <cursor>
+                        <Cursor fx:constant="CLOSED_HAND"/>
+                    </cursor>
+                </Button>
+                <Button cancelButton="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false"
+                        onAction="#cancelarCadastro" text="Cancelar">
+                    <cursor>
+                        <Cursor fx:constant="CLOSED_HAND"/>
+                    </cursor>
+                </Button>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

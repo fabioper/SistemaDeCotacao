@@ -3,6 +3,7 @@ package br.edu.infnet.ui.controllers;
 import br.edu.infnet.domain.cotacoes.Cotacao;
 import br.edu.infnet.ui.models.cotacoes.CotacaoDTO;
 import br.edu.infnet.ui.models.cotacoes.Cotacoes;
+import br.edu.infnet.ui.utils.CSVConverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -11,16 +12,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Window;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class TelaCotacoesController implements Initializable {
-    @FXML
-    private ChoiceBox<String> filtroCotacoes;
-
     @FXML
     private TableView<CotacaoDTO> tabelaCotacoes;
 
@@ -46,10 +49,9 @@ public class TelaCotacoesController implements Initializable {
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public final void initialize(URL url, ResourceBundle resourceBundle) {
         definirColunas();
         carregarCotacoes(_cotacoes.listar());
-        carregarFiltros();
         _cotacoes.onChange(() -> carregarCotacoes(_cotacoes.listar()));
     }
 
@@ -63,7 +65,7 @@ public class TelaCotacoesController implements Initializable {
 
     private void carregarCotacoes(List<Cotacao> cotacoes) {
         ObservableList<CotacaoDTO> dtos = FXCollections.observableArrayList();
-        cotacoes.stream().map((Cotacao produto) -> mapearDTO(produto)).forEach(dtos::add);
+        cotacoes.forEach((Cotacao produto) -> dtos.add(mapearDTO(produto)));
         tabelaCotacoes.setItems(dtos);
     }
 
@@ -75,13 +77,6 @@ public class TelaCotacoesController implements Initializable {
         dto.setData(cotacao.getData());
         dto.setPreco(cotacao.getPreco());
         return dto;
-    }
-
-    private void carregarFiltros() {
-        var opcoes = FXCollections.observableArrayList("Produto", "Id");
-        filtroCotacoes.setItems(opcoes);
-        var selection = filtroCotacoes.getSelectionModel();
-        selection.selectFirst();
     }
 
     public final void abrirTabCadastroCotacao(ActionEvent actionEvent) throws IOException {
@@ -110,6 +105,57 @@ public class TelaCotacoesController implements Initializable {
         }
     }
 
-    private void editarCotacao() {
+    @FXML
+    public final void exportarCotacoesCSV(ActionEvent event) {
+        var homeDir = System.getProperty("user.home");
+        var directoryChooser = openDirectoryChooserDialog(homeDir);
+        var selectedDirectory = directoryChooser.showDialog(getWindowFrom(event));
+
+        if (selectedDirectory.canWrite()) {
+            var converter = new CSVConverter<Cotacao>();
+            var content = converter.convert(_cotacoes.listar(), this::format);
+            var file = new File(selectedDirectory + "/cotacoes.csv");
+            writeToFile(file, content);
+            return;
+        }
+
+        var alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Não é possível escrever neste diretório.");
+        alert.showAndWait();
+    }
+
+    private void writeToFile(File file, String content) {
+        Alert alert;
+
+        try (var writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(content);
+            writer.flush();
+            alert = new Alert(Alert.AlertType.INFORMATION, "O arquivo pode ser acessado em: " + file.getAbsolutePath());
+            alert.setHeaderText("Produto exportado com sucesso!");
+            alert.showAndWait();
+        } catch (IOException e) {
+            alert = new Alert(Alert.AlertType.ERROR, e.getLocalizedMessage());
+            alert.setHeaderText("Ocorreu um erro durante a gravação do arquivo.");
+            alert.showAndWait();
+        }
+    }
+
+    private DirectoryChooser openDirectoryChooserDialog(String homeDir) {
+        var directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(new File(homeDir));
+        directoryChooser.setTitle("Escolha o destino");
+        return directoryChooser;
+    }
+
+    private Window getWindowFrom(ActionEvent event) {
+        var source = (Button) event.getSource();
+        return source.getScene().getWindow();
+    }
+
+    private String format(Cotacao cotacao) {
+        return cotacao.getId() + "," +
+                cotacao.getProduto().getNome() + "," +
+                cotacao.getData() + "," +
+                cotacao.getPreco();
     }
 }

@@ -20,8 +20,6 @@ import java.util.ResourceBundle;
 
 public class TelaProdutosController implements Initializable {
     @FXML
-    private ChoiceBox<String> filtro;
-    @FXML
     private TableView<ProdutoDTO> tabelaProdutos;
     @FXML
     private TableColumn<ProdutoDTO, Integer> colunaId;
@@ -40,7 +38,6 @@ public class TelaProdutosController implements Initializable {
     public final void initialize(URL url, ResourceBundle resourceBundle) {
         definirColunas();
         carregarProdutos(_produtos.listar());
-        carregarFiltros();
         _produtos.onChange(() -> carregarProdutos(_produtos.listar()));
     }
 
@@ -48,15 +45,15 @@ public class TelaProdutosController implements Initializable {
         colunaId.setCellValueFactory(param -> param.getValue().idProperty().asObject());
         colunaProduto.setCellValueFactory(param -> param.getValue().nomeProperty());
         colunaFornecedor.setCellValueFactory(param -> param.getValue().fornecedorProperty());
-        colunaProduto.setCellFactory(TextFieldTableCell.forTableColumn());
-        colunaFornecedor.setCellFactory(TextFieldTableCell.forTableColumn());
 
+        colunaProduto.setCellFactory(TextFieldTableCell.forTableColumn());
         colunaProduto.setOnEditCommit(ev -> {
             int row = ev.getTablePosition().getRow();
             ev.getTableView().getItems().get(row).setNome(ev.getNewValue());
             editarProduto();
         });
 
+        colunaFornecedor.setCellFactory(TextFieldTableCell.forTableColumn());
         colunaFornecedor.setOnEditCommit(ev -> {
             int row = ev.getTablePosition().getRow();
             ev.getTableView().getItems().get(row).setFornecedor(ev.getNewValue());
@@ -68,13 +65,6 @@ public class TelaProdutosController implements Initializable {
         ObservableList<ProdutoDTO> dtos = FXCollections.observableArrayList();
         produtoList.stream().map(this::mapearDTO).forEach(dtos::add);
         tabelaProdutos.setItems(dtos);
-    }
-
-    private void carregarFiltros() {
-        var opcoes = FXCollections.observableArrayList("Fornecedor", "Nome", "Id");
-        filtro.setItems(opcoes);
-        var selection = filtro.getSelectionModel();
-        selection.selectFirst();
     }
 
     @FXML

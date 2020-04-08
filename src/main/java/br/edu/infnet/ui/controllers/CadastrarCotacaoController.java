@@ -4,12 +4,13 @@ import br.edu.infnet.domain.cotacoes.Cotacao;
 import br.edu.infnet.domain.produtos.Produto;
 import br.edu.infnet.ui.models.cotacoes.Cotacoes;
 import br.edu.infnet.ui.models.produtos.Produtos;
+import br.edu.infnet.ui.utils.CurrencyFilter;
+import br.edu.infnet.ui.utils.ProdutoStringConverter;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.time.Instant;
@@ -39,22 +40,39 @@ public class CadastrarCotacaoController implements Initializable {
     public final void initialize(URL url, ResourceBundle resourceBundle) {
         var produtos = FXCollections.observableArrayList(_produtos.listar());
         comboProdutos.setItems(produtos);
-        comboProdutos.setConverter(new ProdutoStringConverter());
+        comboProdutos.setConverter(new ProdutoStringConverter(_produtos));
+        inputPreco.setTextFormatter(new TextFormatter<>(new CurrencyFilter()));
     }
 
     @FXML
     public final void cadastrarCotacao(ActionEvent actionEvent) {
-        var cotacao = new Cotacao();
-        var produtoId = comboProdutos.getSelectionModel().getSelectedItem().getId();
-        var produto = _produtos.obterPorId(produtoId);
-        var date = Instant.from(inputData.getValue().atStartOfDay(ZoneId.systemDefault()));
-        var preco = inputPreco.getText();
+        var selectedItem = comboProdutos.getSelectionModel().getSelectedItem();
 
+        if (selectedItem == null) {
+            var alert = new Alert(Alert.AlertType.ERROR, "Por favor, escolha um produto.");
+            alert.setHeaderText("Produto Ausente");
+            alert.show();
+            return;
+        }
+
+        _cotacoes.inserir(mapCotacao(selectedItem));
+
+        var alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("Cotação inserida com sucesso!");
+        alert.showAndWait();
+        fecharTab(actionEvent);
+    }
+
+    private Cotacao mapCotacao(Produto selectedItem) {
+        var produto = _produtos.obterPorId(selectedItem.getId());
+        var date = Instant.from(inputData.getValue().atStartOfDay(ZoneId.systemDefault()));
+        var preco = inputPreco.getText().replaceAll(",", ".");
+
+        var cotacao = new Cotacao();
         cotacao.setProduto(produto);
         cotacao.setData(Date.from(date));
         cotacao.setPreco(Double.parseDouble(preco));
-        _cotacoes.inserir(cotacao);
-        fecharTab(actionEvent);
+        return cotacao;
     }
 
     @FXML
@@ -67,24 +85,5 @@ public class CadastrarCotacaoController implements Initializable {
         var root = source.getScene().getRoot();
         var tabPane = (TabPane) root.lookup("#tabPane");
         tabPane.getTabs().remove(tabPane.getSelectionModel().getSelectedIndex());
-    }
-
-    private class ProdutoStringConverter extends StringConverter<Produto> {
-        @Override
-        public final String toString(Produto produto) {
-            if (produto != null) {
-                return produto.getNome();
-            }
-            return null;
-        }
-
-        @Override
-        public final Produto fromString(String s) {
-            return _produtos.listar()
-                    .stream()
-                    .filter(p -> p.getNome().equals(s))
-                    .findFirst()
-                    .orElse(null);
-        }
     }
 }

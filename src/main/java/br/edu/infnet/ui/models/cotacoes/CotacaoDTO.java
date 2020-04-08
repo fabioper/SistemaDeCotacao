@@ -14,14 +14,13 @@ public class CotacaoDTO {
     private IntegerProperty id = new SimpleIntegerProperty();
     private StringProperty produtoNome = new SimpleStringProperty();
     private StringProperty produtoFornecedor = new SimpleStringProperty();
-
     private StringProperty data = new SimpleStringProperty();
-
     private StringProperty preco = new SimpleStringProperty();
-    public static final Locale LOCALE = new Locale("pt", "BR");
 
+    public static final Locale LOCALE = new Locale("pt", "BR");
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
     public static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(LOCALE);
+
     public final int getId() {
         return id.get();
     }

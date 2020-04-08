@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane id="border-pane" prefHeight="200.0" prefWidth="200.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.infnet.ui.controllers.TelaProdutosController">
+<BorderPane id="border-pane" prefHeight="200.0" prefWidth="200.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="br.edu.infnet.ui.controllers.TelaProdutosController">
     <top>
         <VBox BorderPane.alignment="CENTER">
             <HBox alignment="CENTER_LEFT">
@@ -24,9 +33,6 @@
                 <padding>
                     <Insets bottom="20.0" left="20.0" right="20.0" />
                 </padding>
-                <TextField promptText="Pesquisar por produto, fornecedor ou ID" HBox.hgrow="ALWAYS" />
-                <ChoiceBox fx:id="filtro" prefWidth="150.0" />
-                <Button mnemonicParsing="false" text="Pesquisar" />
             </HBox>
             <Separator prefWidth="200.0" />
         </VBox>
